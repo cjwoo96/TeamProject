@@ -1,0 +1,187 @@
+@import '../../../styles/style.scss';
+
+//VideoResultOverview
+.RGB {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    animation: blink-effect 2s step-end infinite;
+    div {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    :first-child {
+        background-color: #33ff33;
+        box-shadow: 0 0 10px transparentize(#00ff00, 0.5);
+    }
+    :nth-child(2) {
+        background-color: yellow;
+        box-shadow: 0 0 10px transparentize(yellow, 0.5);
+    }
+    :nth-child(3) {
+        background-color: red;
+        box-shadow: 0 0 10px transparentize(red, 0.5);
+    }
+}
+.scoreboard-container {
+    margin: 0 auto;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    padding: 1px 5px;
+    justify-content: space-between;
+    background-color: #2f2f2f;
+    position: relative;
+    .scoreboard-container-title {
+        animation: blink-effect 2s step-end infinite;
+        font-family: 'LED1';
+        position: absolute;
+        left: 50%;
+        top: 14px;
+        font-size: 15px;
+        font-weight: bold;
+        color: #00ff00;
+        transform: translate(-50%, -50%);
+        text-shadow: 0 0 10px transparentize(#00ff00, 0.5);
+    }
+    .scoreboard-container-inning {
+        position: absolute;
+        left: 50%;
+        bottom: 0px;
+        font-size: 20px;
+        transform: translate(-50%, 0);
+        color: white;
+        font-weight: 700;
+        .scoreboard-inning {
+            font-size: 27px;
+        }
+    }
+    .dropdown {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        color: black;
+        padding: 10px;
+        width: 95%;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        z-index: 100;
+        border-radius: 15px;
+        border: 1px solid #f3f3f3;
+        animation: 0.5s ease-out appleEffect forwards;
+        .swiper-slide {
+            text-align: center;
+            justify-content: center;
+            border-radius: 5px;
+            background-color: #f3f3f3;
+        }
+        span {
+            font-weight: 700;
+            color: $kbo_darkblue;
+            text-align: center;
+        }
+    }
+    .scoreboard {
+        width: 90%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .team-card {
+            width: 40%;
+            box-sizing: border-box;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            color: whitesmoke;
+            border-radius: 15px;
+            padding: 10px;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 15px;
+            img {
+                width: 40px;
+                height: 40px;
+                border-radius: 30%;
+            }
+        }
+        .team-card.currentTeam {
+            color: blue;
+        }
+        .score {
+            font-family: 'LED1';
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 250px;
+            height: 50px;
+            color: #14f29b;
+            font-size: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 5px transparentize(#14f29b, 0.5);
+            span {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+}
+
+.stadium {
+    width: 100%;
+    height: calc(100dvh - 200px);
+    background-color: #a3c47b;
+    position: relative;
+}
+
+.playerCircle-container {
+    position: absolute;
+    width: 55px;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background-color: white;
+    font-size: 10px;
+    font-weight: 700;
+    animation: ani 1s infinite alternate;
+    box-shadow: 4px 4px 5px gray;
+    padding: 10px;
+    overflow: hidden;
+    span {
+        margin-top: 5px;
+    }
+    .playerCircle {
+        width: 45px;
+        height: 45px;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .player-position {
+        width: calc(100% + 20px);
+        background-color: $kbo_darkblue;
+        color: white;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+.stadium-logo {
+    position: absolute;
+    top: 55%;
+    left: 41%;
+    background-color: white;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    background-color: $kbo_darkblue;
+    color: white;
+}
