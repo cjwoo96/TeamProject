@@ -1,5 +1,7 @@
 package com.private_lbs.taskmaster.S3.controller;
 
+import com.amazonaws.services.s3.model.PartETag;
+import com.private_lbs.taskmaster.S3.data.dto.CompleteUploadRequest;
 import com.private_lbs.taskmaster.redis.service.RedisPubService;
 import com.private_lbs.taskmaster.S3.data.dto.EventNotification;
 import com.private_lbs.taskmaster.S3.data.dto.EventRecord;
@@ -15,9 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/S3")
@@ -50,6 +52,7 @@ public class S3Controller {
     // AWS S3에서 파일 업로드 이벤트 수신 및 AI 서버가 SUB 중인 채널로 전송
     @PostMapping("/endpoint")
     public ResponseEntity<Void> receiveFileUrl(@RequestBody EventNotification notification){
+        System.out.println("endPoint 들어옴");
         for (EventRecord record : notification.getRecords()) {
             redisPubService.sendMessage(OriginUrl.makeUrlFromEventRecord(record));
         }
@@ -58,12 +61,13 @@ public class S3Controller {
 
 
 
-    @GetMapping("/generate-url")
+    @GetMapping("/generate-multiparturl")
     public ResponseEntity<?> generateUrl(@RequestParam String filename, @RequestParam Long filesize) {
-        // 여기서 Member ID와 Request ID는 예시로 사용된 값입니다.
-        // 실제 애플리케이션에서는 인증된 사용자의 ID와 요청 ID를 얻는 로직이 필요할 수 있습니다.
+//        System.out.println("요청");
+//        System.out.println(filename+"  "+filesize);
         Member member = memberService.getCurrentMember();
         Request request = requestService.save(member);
+        System.out.println("filename = "+filename+" filesize = "+filesize+ " memberID = "+member.getId()+" requestId = "+request.getId());
         Map<String, Object> response = s3Service.createMultipartUploadUrls(filename, filesize, member.getId(), request.getId());
         return ResponseEntity.ok(response);
     }
@@ -71,8 +75,20 @@ public class S3Controller {
     // 업로드 완료 요청 처리
     @PostMapping("/complete-upload")
     public ResponseEntity<?> completeUpload(@RequestBody CompleteUploadRequest completeUploadRequest) {
-        // 업로드 완료 처리 로직 구현
-        // 예: S3에 CompleteMultipartUpload 요청 보내기
+        System.out.println("completeUploadRequest.getUploadId() = "+completeUploadRequest.getUploadId());
+        System.out.println("completeUploadRequest.getParts() = "+completeUploadRequest.getParts());
+
+
+        // 'completeUploadRequest'의 'parts' 리스트를 스트림으로 변환한 후,
+        // 각 'part' 객체를 'PartETag' 객체로 매핑하고, 최종적으로 리스트로 수집합니다.
+        List<PartETag> partETags = completeUploadRequest.getParts().stream()
+                .map(part -> new PartETag(part.getPartNumber(), part.getEtag()))
+                .collect(Collectors.toList());
+        System.out.println("PartETags:");
+        for (PartETag partETag : partETags) {
+            System.out.println("Part Number: " + partETag.getPartNumber() + ", ETag: " + partETag.getETag());
+        }
+        s3Service.completeMultipartUpload(completeUploadRequest.getUploadId(),partETags);
         return ResponseEntity.ok().build();
     }
 

@@ -42,7 +42,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             AuthenticationContextHolder.setAuthentication(authentication);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+//            log.error(e.getMessage());
         }
 
         doFilter(request, response, filterChain);
