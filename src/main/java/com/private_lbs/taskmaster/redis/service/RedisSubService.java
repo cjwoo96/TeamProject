@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 @Service
-@RequiredArgsConstructor
 public class RedisSubService implements MessageListener {
     private final ObjectMapper mapper = new ObjectMapper();
-
+    private final SseEmitters sseEmitters= new SseEmitters();
     /**
      * @author boyjo
      * @date 2/3/24
@@ -25,9 +24,10 @@ public class RedisSubService implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            RedisSubData redisSubData = mapper.readValue(message.getBody(), RedisSubData.class);
             //TODO: 1. AI 가공이 완료되었다는 메시지가 수신 로직 구현 - SSE 필요
             //TODO: 2. 각 상태별 메시지가 수신 로직 구현 - SSE 필요
+            String mes=new String(message.getBody(),"UTF-8");
+            sseEmitters.sendMessage(mes);
         } catch (RedisException | IOException e) {
             throw new RedisException(RedisErrorCode.MESSAGE_RECEIVE_FAILED);
         }
