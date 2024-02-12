@@ -9,12 +9,14 @@ import com.private_lbs.taskmaster.S3.data.vo.OriginUrl;
 import com.private_lbs.taskmaster.S3.service.S3Service;
 import com.private_lbs.taskmaster.member.domain.Member;
 import com.private_lbs.taskmaster.member.service.MemberService;
+import com.private_lbs.taskmaster.redis.service.SseEmitters;
 import com.private_lbs.taskmaster.request.domain.Request;
 import com.private_lbs.taskmaster.request.service.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.net.URL;
 import java.util.List;
@@ -30,6 +32,21 @@ public class S3Controller {
     private final RequestService requestService;
     private final MemberService memberService;
     private final S3Service s3Service;
+    private final SseEmitters sseEmitters;
+
+
+    @GetMapping(value = "/subscribe", produces = "text/event-stream")
+    public SseEmitter subscribe(){
+        System.out.println("서브스크라이브 단");
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        sseEmitters.addEmitter(emitter);
+
+//        emitter.onCompletion(() -> sseEmitters.removeEmitter(emitter));
+//        emitter.onTimeout(() -> sseEmitters.removeEmitter(emitter));
+//        emitter.onError((e) -> sseEmitters.removeEmitter(emitter));
+
+        return emitter;
+    }
 
     // 클라이언트로부터 AWS S3 사전 서명된 URL 생성 요청을 처리
     @GetMapping("/generate-url")
@@ -55,6 +72,7 @@ public class S3Controller {
         System.out.println("endPoint 들어옴");
         for (EventRecord record : notification.getRecords()) {
             redisPubService.sendMessage(OriginUrl.makeUrlFromEventRecord(record));
+            redisPubService.sendMessage("s3에 영상 업로드 완료!");
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
